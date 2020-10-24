@@ -1,0 +1,81 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>VCoin</title>
+  </head>
+  <body>
+    <h1>VCoin</h1>
+    <form id="form">
+      <input type="text" id="message" />
+      <input type="submit" value="submit" />
+    </form>
+    <h3>message from contract:</h3>
+    <h3 id="latest"></h3>
+    <ul id="list"></ul>
+    <script>
+      const address = "0x6f729d6Cb9580F45A8717091E137fc1e380bB252";
+      const abi = [
+	{
+		"inputs": [
+			{
+				"internalType": "string",
+				"name": "newMessage",
+				"type": "string"
+			}
+		],
+		"name": "setMessage",
+		"outputs": [],
+		"stateMutability": "nonpayable",
+		"type": "function"
+	},
+	{
+		"inputs": [],
+		"name": "message",
+		"outputs": [
+			{
+				"internalType": "string",
+				"name": "",
+				"type": "string"
+			}
+		],
+		"stateMutability": "view",
+		"type": "function"
+	}
+];    let account;
+let contract;
+      window.addEventListener("load", ()=>{
+            window.web3.eth.getAccounts((error, result)=>{
+                account = result[0];
+           
+
+                contract = window.web3.eth.contract(abi).at(address);
+                contract.message.call({from: account}, (error, result)=>{
+                    const latest = document.getElementById("latest");
+                    latest.innerText = result;
+                }
+                )
+            });
+      });
+      const form = document.getElementById("form");
+      form.addEventListener("submit", (e) => {
+          e.preventDefault();
+        const message = document.getElementById("message");
+        
+
+        const list = document.getElementById("list");
+        list.innerHTML = list.innerHTML + "<li>" + message.value+ "</li>";
+        contract.setMessage.sendTransaction(
+            message.value,
+            {
+                from:account,
+                gas: 3000000,
+                gasPrice: 2100000000
+            },
+            ()=>{}
+        )
+      });
+    </script>
+  </body>
+</html>
